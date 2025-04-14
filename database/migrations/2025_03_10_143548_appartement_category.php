@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('appartement_category', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('password');
-            $table->unsignedBigInteger('role_id');
-            $table->rememberToken();
+            $table->unsignedBigInteger('appartement_id');
+            $table->unsignedBigInteger('category_id');
             $table->timestamps();
+    
+            $table->foreign('appartement_id')->references('id')->on('appartements')->onDelete('cascade');
+            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
         });
     }
 
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        //
     }
 };
