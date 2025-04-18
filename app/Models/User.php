@@ -24,6 +24,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(cartes::class);
     }
+    public function reservations()
+    {
+        return $this->hasMany(reservation::class, 'user_id');
+    }
 
     /**
      * The attributes that are mass assignable.

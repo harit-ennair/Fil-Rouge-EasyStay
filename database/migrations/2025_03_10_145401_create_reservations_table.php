@@ -17,6 +17,8 @@ return new class extends Migration
             $table->unsignedBigInteger('appartement_id');
             $table->date('start_date');
             $table->date('end_date');
+            $table->integer('total_price');
+            $table->string('status')->default('pending'); // pending, confirmed, cancelled
             $table->timestamps();     
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('appartement_id')->references('id')->on('appartements')->onDelete('cascade');

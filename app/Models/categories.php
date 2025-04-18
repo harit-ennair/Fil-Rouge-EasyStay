@@ -9,8 +9,13 @@ class categories extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+        'description',
+    ];
+
     public function appartements()
     {
-        return $this->belongsToMany(appartements::class);
+        return $this->belongsToMany(appartements::class, 'appartement_category');
     }
 }

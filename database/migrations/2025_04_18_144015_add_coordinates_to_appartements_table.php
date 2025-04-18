@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('roles', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->timestamps();
-    
+        Schema::table('appartements', function (Blueprint $table) {
+            $table->decimal('latitude', 10, 7)->nullable()->after('location');
+            $table->decimal('longitude', 10, 7)->nullable()->after('latitude');
         });
     }
 
@@ -24,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('roles');
+        Schema::table('appartements', function (Blueprint $table) {
+            $table->dropColumn(['latitude', 'longitude']);
+        });
     }
 };

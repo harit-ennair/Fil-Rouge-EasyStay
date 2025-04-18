@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AppartementsController;
+use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,12 +27,45 @@ Route::post('/login', [UserController::class, 'AuthLogin']);
 Route::get('/register', [UserController::class, 'register'])->name('register');
 Route::post('/register', [UserController::class, 'store']);
 
-Route::get('/logout', [UserController::class, 'logout'])->name('logout');
+Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
-
+// Public routes - accessible to all
 Route::get('/appartements', [AppartementsController::class, 'index'])->name('appartements_index');
-Route::get('/appartements/create', [AppartementsController::class, 'create'])->name('appartements_create');
-Route::post('/appartements/store', [AppartementsController::class, 'store'])->name('appartements_store');
-Route::get('/appartements/{id}/edit', [AppartementsController::class, 'edit'])->name('appartements_edit');
-Route::post('/appartements/{id}/update', [AppartementsController::class, 'update'])->name('appartements_update');
-Route::get('/appartements/{id}/delete', [AppartementsController::class, 'delete'])->name('appartements_delete');
+
+// Owner routes - for property owners
+// Route::middleware(['auth', 'is.owner'])->group(function () {
+    Route::get('/appartements/create', [AppartementsController::class, 'create'])->name('appartements_create');
+    Route::post('/appartements/store', [AppartementsController::class, 'store'])->name('appartements_store');
+    Route::get('/appartements/{id}/edit', [AppartementsController::class, 'edit'])->name('appartements_edit');
+    Route::post('/appartements/{id}/update', [AppartementsController::class, 'update'])->name('appartements_update');
+    Route::get('/appartements/{id}/delete', [AppartementsController::class, 'delete'])->name('appartements_delete');
+    Route::get('/ownerDashboard', [UserController::class, 'ownerDashboard'])->name('owner_dashboard');
+    Route::post('/reservations/{id}/confirm', [ReservationController::class, 'confirm'])->name('reservation.confirm');
+    Route::post('/reservations/{id}/decline', [ReservationController::class, 'decline'])->name('reservation.decline');
+// });
+
+// Specific apartment routes - must come after the create route to avoid route conflicts
+Route::get('/appartements/{id}', [AppartementsController::class, 'show'])->name('appartements_show');
+
+// User routes - for standard users
+// Route::middleware(['auth', 'is.client'])->group(function () {
+    Route::post('/appartements/{id}/reserve', [ReservationController::class, 'store'])->name('appartements_reserve');
+    route::get('/appartements',[appartementsController::class,'index'])->name('appartements_index');
+    Route::get('/appartements/{id}', [AppartementsController::class, 'show'])->name('appartements_show');
+    Route::post('/appartements/{id}', [ReservationController::class,'store'])->name('appartements_reservations');
+    
+// });
+// Route::middleware(['auth', 'is.admin'])->group(function () {
+    Route::post('/appartements/{id}/reserve', [ReservationController::class, 'store'])->name('appartements_reserve');
+    Route::get('/dashboard', [UserController::class, 'dashboard'])->name('admin_dashboard');
+    Route::get('/users', [UserController::class, 'users'])->name('users');
+    Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('user_edit');
+    Route::post('/users/{id}/update', [UserController::class, 'update'])->name('user_update');
+    Route::get('/users/{id}/delete', [UserController::class, 'delete'])->name('user_delete');
+    Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations');
+    Route::get('/reservations/{id}/edit', [ReservationController::class, 'edit'])->name('reservation_edit');
+    Route::post('/reservations/{id}/update', [ReservationController::class, 'update'])->name('reservation_update');
+    Route::get('/reservations/{id}/delete', [ReservationController::class, 'delete'])->name('reservation_delete');
+    Route::get('/appartements/{id}/approve', [AppartementsController::class, 'approve'])->name('appartements_approve');
+    Route::get('/appartements/{id}/reject', [AppartementsController::class, 'reject'])->name('appartements_reject');
+// });

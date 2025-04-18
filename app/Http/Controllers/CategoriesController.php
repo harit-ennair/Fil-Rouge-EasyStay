@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\categories;
-use App\Http\Requests\StorecategoriesRequest;
 use App\Http\Requests\UpdatecategoriesRequest;
+use Illuminate\Http\Request;
 
 class CategoriesController extends Controller
 {
@@ -27,9 +27,18 @@ class CategoriesController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorecategoriesRequest $request)
+    public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required',
+            'description' => 'required',
+        ]);
+
+        categories::create([
+            'name' => $request->name,
+            'description' => $request->description,
+        ]);
+        return redirect()->route('categories.index')->with('success', 'Category created successfully.');
     }
 
     /**
