@@ -50,9 +50,9 @@ class AppartementsController extends Controller
      */
     public function create()
     {
+        
         $categories = categories::all();
         return view('appartements_create', compact('categories'));
-
     }
 
     /**
@@ -98,11 +98,11 @@ class AppartementsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $appartements)
+    public function show($id)
     {
-        $appartement = appartements::find($appartements->id);
-        $photos = photos::where('appartement_id', $appartements->id)->get();
-        $reservations = reservation::where('appartement_id', $appartements->id)->get();
+        $appartement = appartements::findOrFail($id);
+        $photos = photos::where('appartement_id', $id)->get();
+        $reservations = reservation::where('appartement_id', $id)->get();
 
         $similarAppartements = appartements::where('id', '!=', $appartement->id)
         ->where('location', $appartement->location)
@@ -112,26 +112,26 @@ class AppartementsController extends Controller
         ->take(3)
         ->get();
         
-
         return view('appartements_show', compact('appartement', 'photos', 'similarAppartements', 'reservations'));
-
-    
-        
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(appartements $appartements)
+    public function edit($id)
     {
-        return view('appartements_edit', compact('appartements'));
+        $appartements = appartements::findOrFail($id);
+        $categories = categories::all();
+        return view('appartements_edit', compact('appartements', 'categories'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateappartementsRequest $request, appartements $appartements)
+    public function update(Request $request, $id)
     {
+        $appartements = appartements::findOrFail($id);
+        
         $request->validate([
             'title' => 'required',
             'description' => 'required',

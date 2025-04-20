@@ -80,10 +80,10 @@
                     <h2 class="text-2xl font-bold text-gray-800">Edit Apartment Listing</h2>
                     <p class="text-gray-600 mt-2">Update your property information</p>
                 </div>
-                
+
                 <form method="POST" action="{{ route('appartements_update', $appartements->id) }}" class="space-y-6">
                     @csrf
-                    @method('PUT')
+                    <!-- Changed from PUT to POST to match route definition -->
                     <div class="animate-field" style="animation-delay: 0.1s">
                         <label class="block text-gray-700 font-medium mb-2">Apartment Name</label>
                         <input type="text" name="title" value="{{ $appartements->title }}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all" placeholder="Enter apartment name" @focus="currentField = 0">
@@ -110,6 +110,8 @@
                             <input type="hidden" name="latitude" id="latitude" value="{{ $appartements->latitude }}">
                             <input type="hidden" name="longitude" id="longitude" value="{{ $appartements->longitude }}">
                         </div>
+
+
                     </div>
                     
                     <div class="flex justify-between gap-4">

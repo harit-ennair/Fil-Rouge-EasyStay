@@ -8,7 +8,7 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+// use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -188,5 +188,127 @@ class UserController extends Controller
         ));
     }
 
+    public function showProfile($id)
+    {
+        // Find the user
+        $owner = User::findOrFail($id);
+        
+        // Verify this is an owner
+        $ownerRole = Role::where('name', 'owner')->first();
+        if ($owner->role_id !== $ownerRole->id) {
+            return redirect()->back()->with('error', 'User is not a property owner');
+        }
+        
+        // Get the owner's properties
+        $properties = appartements::where('user_id', $owner->id)->get();
+        
+        // Get all reservations for the owner's properties
+        $reservations = reservation::whereIn('appartement_id', $properties->pluck('id'))
+            ->with(['appartement', 'user'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        // Calculate statistics
+        $totalRevenue = $reservations->sum('total_price');
+        $activeBookings = $reservations->where('status', 'confirmed')->count();
+        $totalBookings = $reservations->count();
+        $completedBookings = $reservations->where('status', 'completed')->count();
+        $pendingBookings = $reservations->where('status', 'pending')->count();
+        
+        // Calculate monthly revenue for the last 6 months
+        $monthlyRevenue = [];
+        for ($i = 0; $i < 6; $i++) {
+            $month = now()->subMonths($i);
+            $revenue = $reservations
+                ->where('created_at', '>=', $month->startOfMonth())
+                ->where('created_at', '<=', $month->endOfMonth())
+                ->sum('total_price');
+                
+            $monthlyRevenue[$month->format('M Y')] = $revenue;
+        }
+        
+        // Convert to JSON for chart
+        $monthlyRevenueJson = json_encode(array_reverse($monthlyRevenue));
+        
+        return view('owner-profile', compact(
+            'owner',
+            'properties',
+            'reservations',
+            'totalRevenue',
+            'activeBookings',
+            'totalBookings',
+            'completedBookings',
+            'pendingBookings',
+            'monthlyRevenueJson'
+        ));
+    }
 
+    public function clientProfile($id)
+    {
+        // Find the user
+        $client = User::findOrFail($id);
+        
+        // Verify this is a client
+        $clientRole = Role::where('name', 'client')->first();
+        if ($client->role_id !== $clientRole->id) {
+            return redirect()->back()->with('error', 'User is not a client');
+        }
+        
+        // Get all the client's reservations with related data
+        $reservations = reservation::where('user_id', $client->id)
+            ->with(['appartement'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        // Calculate statistics
+        $totalSpent = $reservations->sum('total_price');
+        $totalBookings = $reservations->count();
+        $confirmedBookings = $reservations->where('status', 'confirmed')->count();
+        $pendingBookings = $reservations->where('status', 'pending')->count();
+        $cancelledBookings = $reservations->where('status', 'cancelled')->count();
+        
+        // Calculate monthly spending for the last 6 months
+        $monthlySpending = [];
+        for ($i = 0; $i < 6; $i++) {
+            $month = now()->subMonths($i);
+            $spending = $reservations
+                ->where('created_at', '>=', $month->startOfMonth())
+                ->where('created_at', '<=', $month->endOfMonth())
+                ->sum('total_price');
+                
+            $monthlySpending[$month->format('M Y')] = $spending;
+        }
+        
+        // Convert to JSON for chart
+        $monthlySpendingJson = json_encode(array_reverse($monthlySpending));
+        
+        // Get unique destinations (locations) visited
+        $visitedLocations = $reservations->map(function($reservation) {
+            return $reservation->appartement->location ?? 'Unknown';
+        })->unique()->values();
+        
+        // Get favorite destinations (most booked)
+        $favoriteLocations = $reservations
+            ->groupBy(function($reservation) {
+                return $reservation->appartement->location ?? 'Unknown';
+            })
+            ->map(function($group) {
+                return $group->count();
+            })
+            ->sortDesc()
+            ->take(3);
+        
+        return view('client-profile', compact(
+            'client',
+            'reservations',
+            'totalSpent',
+            'totalBookings',
+            'confirmedBookings',
+            'pendingBookings',
+            'cancelledBookings',
+            'monthlySpendingJson',
+            'visitedLocations',
+            'favoriteLocations'
+        ));
+    }
 }

@@ -25,6 +25,9 @@
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <!-- Include Navigation Component -->
+    @include('components.navigation')
+    
     <!-- Header Banner -->
     <div class="bg-pattern relative">
         <div class="absolute inset-0 bg-gradient-to-br from-teal-500/80 to-blue-600/80"></div>

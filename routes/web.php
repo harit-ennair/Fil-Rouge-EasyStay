@@ -3,6 +3,7 @@
 use App\Http\Controllers\AppartementsController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\OwnerPropertiesController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,9 +17,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
 
 Route::get('/login', [UserController::class, 'login'])->name('login');
@@ -30,10 +31,11 @@ Route::post('/register', [UserController::class, 'store']);
 Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
 // Public routes - accessible to all
+Route::get('/', [AppartementsController::class, 'index'])->name('appartements_index');
 Route::get('/appartements', [AppartementsController::class, 'index'])->name('appartements_index');
 
 // Owner routes - for property owners
-// Route::middleware(['auth', 'is.owner'])->group(function () {
+Route::middleware(['auth', 'is.owner'])->group(function () {
     Route::get('/appartements/create', [AppartementsController::class, 'create'])->name('appartements_create');
     Route::post('/appartements/store', [AppartementsController::class, 'store'])->name('appartements_store');
     Route::get('/appartements/{id}/edit', [AppartementsController::class, 'edit'])->name('appartements_edit');
@@ -42,21 +44,20 @@ Route::get('/appartements', [AppartementsController::class, 'index'])->name('app
     Route::get('/ownerDashboard', [UserController::class, 'ownerDashboard'])->name('owner_dashboard');
     Route::post('/reservations/{id}/confirm', [ReservationController::class, 'confirm'])->name('reservation.confirm');
     Route::post('/reservations/{id}/decline', [ReservationController::class, 'decline'])->name('reservation.decline');
-// });
+    // Owner Properties Routes
+    Route::get('/owner/properties', [OwnerPropertiesController::class, 'index'])->name('owner.properties');
+    Route::get('/owner/properties/{id}/delete', [OwnerPropertiesController::class, 'delete'])->name('owner.properties.delete');
+});
 
-// Specific apartment routes - must come after the create route to avoid route conflicts
 Route::get('/appartements/{id}', [AppartementsController::class, 'show'])->name('appartements_show');
-
 // User routes - for standard users
-// Route::middleware(['auth', 'is.client'])->group(function () {
+Route::middleware(['auth', 'is.client'])->group(function () {
     Route::post('/appartements/{id}/reserve', [ReservationController::class, 'store'])->name('appartements_reserve');
-    route::get('/appartements',[appartementsController::class,'index'])->name('appartements_index');
-    Route::get('/appartements/{id}', [AppartementsController::class, 'show'])->name('appartements_show');
-    Route::post('/appartements/{id}', [ReservationController::class,'store'])->name('appartements_reservations');
-    
-// });
-// Route::middleware(['auth', 'is.admin'])->group(function () {
-    Route::post('/appartements/{id}/reserve', [ReservationController::class, 'store'])->name('appartements_reserve');
+    Route::post('/appartements/{id}', [ReservationController::class, 'store'])->name('appartements_reservations');
+});
+
+// Admin routes
+Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/dashboard', [UserController::class, 'dashboard'])->name('admin_dashboard');
     Route::get('/users', [UserController::class, 'users'])->name('users');
     Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('user_edit');
@@ -68,4 +69,6 @@ Route::get('/appartements/{id}', [AppartementsController::class, 'show'])->name(
     Route::get('/reservations/{id}/delete', [ReservationController::class, 'delete'])->name('reservation_delete');
     Route::get('/appartements/{id}/approve', [AppartementsController::class, 'approve'])->name('appartements_approve');
     Route::get('/appartements/{id}/reject', [AppartementsController::class, 'reject'])->name('appartements_reject');
-// });
+    Route::get('/owners/{id}/profile', [UserController::class, 'showProfile'])->name('owner_profile');
+    Route::get('/clients/{id}/profile', [UserController::class, 'showClientProfile'])->name('client_profile');
+});
