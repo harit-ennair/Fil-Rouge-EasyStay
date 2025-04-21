@@ -105,10 +105,24 @@ class AppartementsController extends Controller
         $reservations = reservation::where('appartement_id', $id)->get();
 
         $similarAppartements = appartements::where('id', '!=', $appartement->id)
-        ->where('location', $appartement->location)
-        ->whereHas('categories', function($query) use ($appartement) {
-            $query->whereIn('categories.id', $appartement->categories->pluck('id'));
+        ->where(function($query) use ($appartement) {
+            // First try to find by location
+            $locationQuery = clone $query;
+            $locationQuery->where('location', $appartement->location);
+            
+            // Check if apartments with same location exist
+            if (appartements::where('id', '!=', $appartement->id)
+            ->where('location', $appartement->location)->exists()) {
+            $query->where('location', $appartement->location);
+            } 
+            // If no apartments found by location, search by categories
+            elseif ($appartement->categories->isNotEmpty()) {
+            $query->whereHas('categories', function($subQuery) use ($appartement) {
+                $subQuery->whereIn('categories.id', $appartement->categories->pluck('id'));
+            });
+            }
         })
+        
         ->take(3)
         ->get();
         
@@ -161,5 +175,83 @@ class AppartementsController extends Controller
         $appartements->delete();
 
         return redirect()->route('appartements_index')->with('success', 'Appartement deleted successfully.');
+    }
+
+    /**
+     * Display all properties for admin
+     */
+    public function allProperties()
+    {
+        // Get all properties with their photos, categories, reservations and owner information
+        $properties = appartements::with(['photos', 'categories', 'reservations', 'user'])
+                        ->orderBy('created_at', 'desc')
+                        ->paginate(15);
+        
+        // Calculate statistics for each property
+        foreach ($properties as $property) {
+            // Calculate the number of active reservations
+            $property->activeReservations = $property->reservations->where('status', 'confirmed')->count();
+            
+            // Calculate total revenue for this property
+            $property->totalRevenue = $property->reservations->where('status', 'confirmed')->sum('total_price');
+            
+            // Calculate occupancy rate (if applicable)
+            $totalDays = now()->diffInDays($property->created_at);
+            $bookedDays = $property->reservations->where('status', 'confirmed')
+                ->sum(function($reservation) {
+                    return \Carbon\Carbon::parse($reservation->start_date)
+                        ->diffInDays(\Carbon\Carbon::parse($reservation->end_date));
+                });
+                
+            $property->occupancyRate = $totalDays > 0 ? round(($bookedDays / $totalDays) * 100) : 0;
+        }
+
+        // Get property owners for the filter dropdown
+        $owners = \App\Models\User::whereHas('appartements')->get();
+        
+        // Use top rated or most booked properties instead of featured
+        // since the 'featured' column doesn't exist
+        $featuredCount = appartements::withCount(['reservations' => function($query) {
+                           $query->where('status', 'confirmed');
+                        }])
+                        ->having('reservations_count', '>', 0)
+                        ->count();
+        
+        // Get total active bookings 
+        $activeBookingsCount = reservation::where('status', 'confirmed')->count();
+        
+        // Calculate total revenue from all properties
+        $totalRevenue = reservation::where('status', 'confirmed')->sum('total_price');
+        
+        // Get top performing properties
+        $topProperties = appartements::withCount(['reservations as totalBookings' => function($query) {
+                            $query->where('status', 'confirmed');
+                        }])
+                        ->withSum(['reservations as totalRevenue' => function($query) {
+                            $query->where('status', 'confirmed');
+                        }], 'total_price')
+                        ->orderByDesc('totalRevenue')
+                        ->take(5)
+                        ->get();
+        
+        // Get category statistics
+        $categoryStats = categories::withCount('appartements')
+                            ->having('appartements_count', '>', 0)
+                            ->orderByDesc('appartements_count')
+                            ->get();
+        
+        // Get total properties count
+        $propertiesCount = appartements::count();
+        
+        return view('all_properties', compact(
+            'properties', 
+            'owners', 
+            'featuredCount', 
+            'activeBookingsCount', 
+            'totalRevenue', 
+            'topProperties', 
+            'categoryStats',
+            'propertiesCount'
+        ));
     }
 }

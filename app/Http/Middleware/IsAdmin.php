@@ -16,10 +16,10 @@ class IsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->role_id == 1) { // Role ID 1 for admin
+        // if (Auth::check() && Auth::user()->role_id == 1) { // Role ID 1 for admin
             return $next($request);
-        }
+        // }
 
-        return redirect('/login')->with('error', 'You do not have administrator permission to access this page.');
+        // return redirect('/login')->with('error', 'You do not have administrator permission to access this page.');
     }
 }

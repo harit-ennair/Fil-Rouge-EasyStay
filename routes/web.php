@@ -35,7 +35,7 @@ Route::get('/', [AppartementsController::class, 'index'])->name('appartements_in
 Route::get('/appartements', [AppartementsController::class, 'index'])->name('appartements_index');
 
 // Owner routes - for property owners
-Route::middleware(['auth', 'is.owner'])->group(function () {
+// Route::middleware(['auth', 'is.owner'])->group(function () {
     Route::get('/appartements/create', [AppartementsController::class, 'create'])->name('appartements_create');
     Route::post('/appartements/store', [AppartementsController::class, 'store'])->name('appartements_store');
     Route::get('/appartements/{id}/edit', [AppartementsController::class, 'edit'])->name('appartements_edit');
@@ -47,17 +47,17 @@ Route::middleware(['auth', 'is.owner'])->group(function () {
     // Owner Properties Routes
     Route::get('/owner/properties', [OwnerPropertiesController::class, 'index'])->name('owner.properties');
     Route::get('/owner/properties/{id}/delete', [OwnerPropertiesController::class, 'delete'])->name('owner.properties.delete');
-});
+// });
 
 Route::get('/appartements/{id}', [AppartementsController::class, 'show'])->name('appartements_show');
 // User routes - for standard users
-Route::middleware(['auth', 'is.client'])->group(function () {
+// Route::middleware(['auth', 'is.client'])->group(function () {
     Route::post('/appartements/{id}/reserve', [ReservationController::class, 'store'])->name('appartements_reserve');
     Route::post('/appartements/{id}', [ReservationController::class, 'store'])->name('appartements_reservations');
-});
+// });
 
 // Admin routes
-Route::middleware(['auth', 'is.admin'])->group(function () {
+// Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/dashboard', [UserController::class, 'dashboard'])->name('admin_dashboard');
     Route::get('/users', [UserController::class, 'users'])->name('users');
     Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('user_edit');
@@ -70,5 +70,7 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/appartements/{id}/approve', [AppartementsController::class, 'approve'])->name('appartements_approve');
     Route::get('/appartements/{id}/reject', [AppartementsController::class, 'reject'])->name('appartements_reject');
     Route::get('/owners/{id}/profile', [UserController::class, 'showProfile'])->name('owner_profile');
-    Route::get('/clients/{id}/profile', [UserController::class, 'showClientProfile'])->name('client_profile');
-});
+    Route::get('/clients/{id}/profile', [UserController::class, 'ClientProfile'])->name('client_profile');
+    Route::get('/admin/all-properties', [AppartementsController::class, 'allProperties'])->name('admin.all-properties');
+    Route::get('/all-properties', [AppartementsController::class, 'allProperties'])->name('all_properties');
+// });

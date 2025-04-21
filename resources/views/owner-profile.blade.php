@@ -1,28 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EasyStay - Owner Profile</title>
-    @vite('resources/css/app.css')
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-field {
-            animation: fadeIn 0.4s ease-out forwards;
-            opacity: 0;
-        }
-    </style>
-</head>
-<body class="bg-gray-50">
-@include('components.navigation')
+@extends('layouts.app')
 
+@section('content')
 <div class="py-12">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="flex items-center mb-6">
@@ -231,7 +209,20 @@
                 </table>
             </div>
         </div>
-    </div>
+
+
+        <!-- Actions -->
+        <div class="bg-white overflow-hidden shadow-sm rounded-lg">
+            <div class="p-6 bg-white border-b border-gray-200">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Actions</h2>
+                <div class="space-y-3">
+                    <a href="{{ route('user_delete', $owner->id) }}" class="block w-full text-center py-2 px-4 border border-red-300 rounded-md shadow-sm text-sm font-medium text-red-700 bg-white hover:bg-red-50 focus:outline-none" onclick="return confirm('Are you sure you want to delete this client?')">
+                        Delete Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>    
 </div>
 
 <!-- JavaScript for Chart -->
@@ -271,5 +262,4 @@
         });
     });
 </script>
-</body>
-</html>
+@endsection

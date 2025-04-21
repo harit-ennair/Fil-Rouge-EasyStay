@@ -6,6 +6,10 @@ use App\Models\Reservation;
 use App\Http\Requests\StorereservationRequest;
 use App\Http\Requests\UpdatereservationRequest;
 use Illuminate\Http\Request;
+use App\Models\User;
+use App\Notifications\NewReservationNotification;
+use App\Notifications\ReservationConfirmedNotification;
+use App\Notifications\ReservationDeclinedNotification;
 
 class ReservationController extends Controller
 {
@@ -39,7 +43,11 @@ class ReservationController extends Controller
         $reservation->status = 'pending'; // default status
         $reservation->save();
 
-        return redirect()->route('appartements_index')->with('success', 'Reservation created successfully.');
+        // Get the owner of the apartment and send notification
+        $owner = User::find($reservation->appartement->user_id);
+        $owner->notify(new NewReservationNotification($reservation));
+
+        return redirect()->route('appartements_index')->with('success', 'Reservation created successfully. The owner has been notified.');
     }
 
     /**
@@ -90,7 +98,11 @@ class ReservationController extends Controller
         $reservation->status = 'confirmed';
         $reservation->save();
         
-        return redirect()->back()->with('success', 'Reservation confirmed successfully.');
+        // Notify the client about the confirmation
+        $client = User::find($reservation->user_id);
+        $client->notify(new ReservationConfirmedNotification($reservation));
+        
+        return redirect()->back()->with('success', 'Reservation confirmed successfully. The client has been notified.');
     }
 
     /**
@@ -109,6 +121,10 @@ class ReservationController extends Controller
         $reservation->status = 'cancelled';
         $reservation->save();
         
-        return redirect()->back()->with('success', 'Reservation declined successfully.');
+        // Notify the client about the decline
+        $client = User::find($reservation->user_id);
+        $client->notify(new ReservationDeclinedNotification($reservation));
+        
+        return redirect()->back()->with('success', 'Reservation declined successfully. The client has been notified.');
     }
 }

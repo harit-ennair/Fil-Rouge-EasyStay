@@ -53,9 +53,9 @@
                             @endif
 
                             @if(auth()->user() && auth()->user()->role_id == 2)
-                                <a href="{{ route('owner_profile', auth()->user()->id) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                                <a href="{{ route('owner_profile', ['id' => auth()->user()->id]) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
                             @elseif(auth()->user())
-                                <a href="{{ route('client_profile', auth()->user()->id) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                                <a href="{{ route('client_profile', ['id' => auth()->user()->id]) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
                             @endif
                             
                             <!-- <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
@@ -127,18 +127,20 @@
                                         <a href="{{ route('admin_dashboard') }}" class="block px-4 py-2 text-base font-medium text-gray-900 hover:bg-gray-100">
                                             Dashboard
                                         </a>
+                                        <a href="{{ route('owner_profile', ['id' => auth()->user()->id]) }}" class="block px-4 py-2 text-base font-medium text-gray-900 hover:bg-gray-100">
+                                            Profile
+                                        </a>
                                         @endif
                                         @if(auth()->user() && auth()->user()->role_id == 2)
                                             <a href="{{ route('owner_dashboard') }}" class="block px-4 py-2 text-base font-medium text-gray-900 hover:bg-gray-100">
                                                 Owner Portal
                                             </a>
-                                        @endif
-                                        @if(auth()->user() && auth()->user()->role_id == 2)
-                                            <a href="{{ route('owner_profile', auth()->user()->id) }}" class="block px-4 py-2 text-base font-medium text-gray-900 hover:bg-gray-100">
+                                            <a href="{{ route('owner_profile', ['id' => auth()->user()->id]) }}" class="block px-4 py-2 text-base font-medium text-gray-900 hover:bg-gray-100">
                                                 Profile
                                             </a>
-                                        @elseif(auth()->user())
-                                            <a href="{{ route('client_profile', auth()->user()->id) }}" class="block px-4 py-2 text-base font-medium text-gray-900 hover:bg-gray-100">
+                                        @endif
+                                        @if(auth()->user() && auth()->user()->role_id == 3)
+                                            <a href="{{ route('client_profile', ['id' => auth()->user()->id]) }}" class="block px-4 py-2 text-base font-medium text-gray-900 hover:bg-gray-100">
                                                 Profile
                                             </a>
                                         @endif

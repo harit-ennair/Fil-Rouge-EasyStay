@@ -1,33 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EasyStay - Client Profile</title>
-    @vite('resources/css/app.css')
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-field {
-            animation: fadeIn 0.4s ease-out forwards;
-            opacity: 0;
-        }
-        .animate-item:nth-child(1) { animation-delay: 0.1s; }
-        .animate-item:nth-child(2) { animation-delay: 0.2s; }
-        .animate-item:nth-child(3) { animation-delay: 0.3s; }
-        .animate-item:nth-child(4) { animation-delay: 0.4s; }
-        .animate-item:nth-child(5) { animation-delay: 0.5s; }
-    </style>
-</head>
-<body class="bg-gray-50">
-@include('components.navigation')
+@extends('layouts.app')
 
+@section('content')
 <div class="py-12">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-sm rounded-lg mb-6">
@@ -54,20 +27,6 @@
                             <p class="text-gray-500">{{ $client->email }}</p>
                         </div>
                     </div>
-                    <!-- <div class="mt-4 md:mt-0 flex space-x-3">
-                        <a href="mailto:{{ $client->email }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none">
-                            <svg class="h-5 w-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                            </svg>
-                            Contact
-                        </a>
-                        <a href="{{ route('user_edit', $client->id) }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none">
-                            <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
-                            </svg>
-                            Edit Profile
-                        </a>
-                    </div> -->
                 </div>
 
                 <!-- Client Stats Summary -->
@@ -351,5 +310,20 @@
         });
     });
 </script>
-</body>
-</html>
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-field {
+        animation: fadeIn 0.4s ease-out forwards;
+        opacity: 0;
+    }
+    .animate-item:nth-child(1) { animation-delay: 0.1s; }
+    .animate-item:nth-child(2) { animation-delay: 0.2s; }
+    .animate-item:nth-child(3) { animation-delay: 0.3s; }
+    .animate-item:nth-child(4) { animation-delay: 0.4s; }
+    .animate-item:nth-child(5) { animation-delay: 0.5s; }
+</style>
+@endsection

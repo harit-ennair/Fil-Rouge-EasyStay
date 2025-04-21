@@ -16,6 +16,6 @@ class categories extends Model
 
     public function appartements()
     {
-        return $this->belongsToMany(appartements::class, 'appartement_category');
+        return $this->belongsToMany(appartements::class, 'appartement_category', 'category_id', 'appartement_id');
     }
 }

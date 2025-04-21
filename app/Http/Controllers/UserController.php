@@ -78,6 +78,13 @@ class UserController extends Controller
         return redirect('/login')->with('success', 'Successfully logged out');
     }
 
+    public function delete($id)
+    {
+        $user = User::findOrFail($id);
+        $user->delete();
+        return redirect('/dashboard')->with('success', 'User deleted successfully');
+    }
+
 
     public function dashboard()
     {
@@ -193,9 +200,15 @@ class UserController extends Controller
         // Find the user
         $owner = User::findOrFail($id);
         
-        // Verify this is an owner
+        // Get the owner role
         $ownerRole = Role::where('name', 'owner')->first();
-        if ($owner->role_id !== $ownerRole->id) {
+        
+        // Check if current user is admin
+        $currentUser = Auth::user();
+        $adminRole = Role::where('name', 'admin')->first();
+        
+        // Only allow if the user being viewed is an owner OR the current user is an admin
+        if ($owner->role_id !== $ownerRole->id && (!$currentUser || $currentUser->role_id !== $adminRole->id)) {
             return redirect()->back()->with('error', 'User is not a property owner');
         }
         
