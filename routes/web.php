@@ -73,4 +73,5 @@ Route::get('/appartements/{id}', [AppartementsController::class, 'show'])->name(
     Route::get('/clients/{id}/profile', [UserController::class, 'ClientProfile'])->name('client_profile');
     Route::get('/admin/all-properties', [AppartementsController::class, 'allProperties'])->name('admin.all-properties');
     Route::get('/all-properties', [AppartementsController::class, 'allProperties'])->name('all_properties');
+
 // });

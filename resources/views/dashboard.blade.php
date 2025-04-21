@@ -87,13 +87,51 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <!-- System Performance Chart -->
             <div class="bg-white overflow-hidden shadow-sm rounded-lg lg:col-span-2">
-            <div class="p-6 bg-white border-b border-gray-200">
+                <div class="p-6 bg-white border-b border-gray-200">
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Booking & Apartment Statistics</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <!-- Booking Statistics -->
                         <div class="bg-blue-50 p-4 rounded-lg">
-                            <p class="text-gray-500">Performance metrics visualization</p>
-                            <p class="text-xs text-gray-400">User growth, bookings, and revenue trends</p>
+                            <h4 class="font-medium text-gray-800 mb-2">Booking Activity</h4>
+                            <div class="flex justify-between items-center mb-2">
+                                <div>
+                                    <p class="text-sm text-gray-500">Active Bookings</p>
+                                    <p class="text-lg font-bold">{{ $Active_Bookings }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Total Revenue</p>
+                                    <p class="text-lg font-bold">€{{ number_format($totalRevenue, 2) }}</p>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <canvas id="bookingChart" width="100%" height="120"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- Property Statistics -->
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <h4 class="font-medium text-gray-800 mb-2">Property Overview</h4>
+                            <div class="flex justify-between items-center mb-2">
+                                <div>
+                                    <p class="text-sm text-gray-500">Total Properties</p>
+                                    <p class="text-lg font-bold">{{ $Total_Properties }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Total Owners</p>
+                                    <p class="text-lg font-bold">{{ $allOwners->count() }}</p>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <canvas id="propertyChart" width="100%" height="120"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Monthly Revenue Chart -->
+                    <div class="mt-6">
+                        <h4 class="font-medium text-gray-800 mb-2">Revenue Trends</h4>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <canvas id="revenueChart" width="100%" height="200"></canvas>
                         </div>
                     </div>
                 </div>
@@ -104,33 +142,32 @@
                 <div class="p-6 bg-white border-b border-gray-200">
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Platform Summary</h3>
                     <div class="space-y-4">
-                        <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                        <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
                             <div>
                                 <h4 class="font-medium">Property Owners</h4>
                                 <p class="text-sm text-gray-500">{{ $allOwners->count() }} active</p>
                             </div>
-                            <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">+12% growth</span>
+                            <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                                +{{ $ownerGrowthRate }}% growth
+                            </span>
                         </div>
                         
-                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <div class="flex justify-between items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition">
                             <div>
                                 <h4 class="font-medium">Active Guests</h4>
                                 <p class="text-sm text-gray-500">{{ $topClients->count() }} users</p>
                             </div>
-                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">Healthy</span>
+                            <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">Active</span>
                         </div>
                         
-                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <div class="flex justify-between items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition">
                             <div>
                                 <h4 class="font-medium">System Status</h4>
-                                <p class="text-sm text-gray-500">All services operational</p>
+                                <p class="text-sm text-gray-500">All services {{ $systemStatus['status'] }}</p>
                             </div>
-                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">99.9% uptime</span>
+                            <span class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium">{{ $systemStatus['uptime'] }} uptime</span>
                         </div>
                         
-                        <a href="#" class="block text-center py-2 px-4 border border-indigo-500 text-indigo-500 rounded-md hover:bg-indigo-500 hover:text-white transition mt-4">
-                            View System Status
-                        </a>
                     </div>
                 </div>
             </div>
@@ -266,18 +303,18 @@
                                 </svg>
                                 <span class="font-medium text-indigo-700">Manage Properties</span>
                             </a>
-                        <a href="{{ route('all_properties') }}" class="block p-4 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition text-center">
-                                <svg class="h-8 w-8 text-indigo-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
+                        <a href="{{ route('all_properties') }}" class="block p-4 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition text-center">
+                                <svg class="h-8 w-8 text-emerald-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                                 </svg>
-                                <span class="font-medium text-indigo-700">All Properties</span>
+                                <span class="font-medium text-emerald-700">All Properties</span>
                             </a>
 
                     </div>
                 </div>
             </div>
             
-            <div class="bg-white overflow-hidden shadow-sm rounded-lg">
+            <!-- <div class="bg-white overflow-hidden shadow-sm rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
                     <h3 class="text-lg font-medium text-gray-900 mb-4">System Alerts</h3>
                     <div class="space-y-4">
@@ -323,9 +360,155 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Booking Chart
+        const bookingCtx = document.getElementById('bookingChart').getContext('2d');
+        new Chart(bookingCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Active', 'Completed', 'Pending', 'Cancelled'],
+                datasets: [{
+                    data: [
+                        {{ $Active_Bookings }}, 
+                        {{ $reservations->where('status', 'completed')->count() }}, 
+                        {{ $reservations->where('status', 'pending')->count() }}, 
+                        {{ $reservations->where('status', 'cancelled')->count() }}
+                    ],
+                    backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            boxWidth: 12,
+                            font: {
+                                size: 10
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Property Chart
+        const propertyCtx = document.getElementById('propertyChart').getContext('2d');
+        new Chart(propertyCtx, {
+            type: 'pie',
+            data: {
+                labels: [
+                    // Get 5 most common locations
+                    @foreach(collect($allApartments)->groupBy('location')->take(5) as $location => $properties)
+                    "{{ $location }}",
+                    @endforeach
+                    "Other"
+                ],
+                datasets: [{
+                    data: [
+                        @foreach(collect($allApartments)->groupBy('location')->take(5) as $properties)
+                        {{ $properties->count() }},
+                        @endforeach
+                        {{ collect($allApartments)->groupBy('location')->skip(5)->sum(function($items) { return $items->count(); }) }}
+                    ],
+                    backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#6b7280'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            boxWidth: 12,
+                            font: {
+                                size: 10
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Monthly Revenue Chart
+        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+        
+        // Calculate monthly revenue for the last 6 months
+        const months = [];
+        const monthlyRevenue = [];
+        const monthlyProperties = [];
+        
+        @for ($i = 5; $i >= 0; $i--)
+            months.push('{{ \Carbon\Carbon::now()->subMonths($i)->format("M Y") }}');
+            
+            // Revenue for this month
+            monthlyRevenue.push({{ 
+                $reservations->where('created_at', '>=', \Carbon\Carbon::now()->subMonths($i)->startOfMonth())
+                ->where('created_at', '<=', \Carbon\Carbon::now()->subMonths($i)->endOfMonth())
+                ->sum('total_price') 
+            }});
+            
+            // New properties this month
+            monthlyProperties.push({{ 
+                collect($allApartments)->where('created_at', '>=', \Carbon\Carbon::now()->subMonths($i)->startOfMonth())
+                ->where('created_at', '<=', \Carbon\Carbon::now()->subMonths($i)->endOfMonth())
+                ->count()
+            }});
+        @endfor
+        
+        new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [
+                    {
+                        label: 'Monthly Revenue (€)',
+                        data: monthlyRevenue,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'New Properties',
+                        data: monthlyProperties,
+                        borderColor: '#10b981',
+                        backgroundColor: 'transparent',
+                        borderDash: [5, 5],
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
+@endpush

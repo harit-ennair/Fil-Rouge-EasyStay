@@ -269,7 +269,7 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Monthly Spending (€)',
+                    label: 'Monthly Spending ($)',
                     data: values,
                     backgroundColor: 'rgba(79, 70, 229, 0.2)',
                     borderColor: 'rgba(79, 70, 229, 1)',

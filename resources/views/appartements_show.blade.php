@@ -19,10 +19,6 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span>
-                    @php
-                        $latestReservation = $appartement->reservations()->orderBy('end_date', 'desc')->first();
-                    @endphp
-                    
                     @if(!$latestReservation || strtotime($latestReservation->end_date) < time())
                         Available now
                     @else
@@ -199,15 +195,8 @@
             <div class="mt-6 bg-white p-6 rounded-xl shadow-md animate-item" style="animation-delay: 0.6s">
                 <h2 class="text-xl font-bold text-gray-800">Reservation</h2>
                 <div class="mt-4 space-y-6">
-                    @php
-                        $reservations = App\Models\Reservation::where('appartement_id', $appartement->id)
-                            ->with('user')->take(4)
-                            ->orderBy('created_at', 'desc')
-                            ->get();
-                    @endphp
-
-                    @if($reservations->count() > 0)
-                        @foreach($reservations as $reservation)
+                    @if($recentReservations->count() > 0)
+                        @foreach($recentReservations as $reservation)
                             <div class="border-b border-gray-200 pb-4 mb-4 last:border-0 last:pb-0 last:mb-0">
                                 <div class="flex items-start">
                                     <div class="flex-shrink-0 mr-4">
@@ -220,8 +209,8 @@
                                         <p class="text-sm text-gray-600">{{ $reservation->created_at->format('F Y') }}</p>
                                         <div class="mt-2">
                                             <p class="text-gray-700">
-                                                Stayed from {{ \Carbon\Carbon::parse($reservation->check_in)->format('d M Y') }} 
-                                                to {{ \Carbon\Carbon::parse($reservation->check_out)->format('d M Y') }}
+                                                Stayed from {{ \Carbon\Carbon::parse($reservation->start_date)->format('d M Y') }} 
+                                                to {{ \Carbon\Carbon::parse($reservation->end_date)->format('d M Y') }}
                                             </p>
                                         </div>
                                     </div>

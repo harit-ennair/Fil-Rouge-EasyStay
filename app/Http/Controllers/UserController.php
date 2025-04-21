@@ -143,6 +143,26 @@ class UserController extends Controller
         }
         $topOwners = $ownersWithRevenue->sortByDesc('totalRevenue')->take(5);
         
+        // Calculate platform summary data
+        $previousMonthOwners = User::where('role_id', 2)
+            ->where('created_at', '<', \Carbon\Carbon::now()->startOfMonth())
+            ->count();
+        $currentOwners = $allOwners->count();
+        $ownerGrowthRate = $previousMonthOwners > 0 
+            ? round(($currentOwners - $previousMonthOwners) / $previousMonthOwners * 100) 
+            : 0;
+            
+        // System status data - in a real application, you might get this from a monitoring service
+        $systemStatus = [
+            'status' => 'operational',
+            'uptime' => '99.9%',
+            'services' => [
+                'website' => 'operational',
+                'booking' => 'operational',
+                'payment' => 'operational',
+            ]
+        ];
+        
         return view('dashboard', compact(
             'user', 
             'Total_Users', 
@@ -154,7 +174,11 @@ class UserController extends Controller
             'topClients',
             'topOwners',
             'apartmentsByOwner',
-            'reservationsByApartment'
+            'reservationsByApartment',
+            'allApartments',
+            'allReservations',
+            'ownerGrowthRate',
+            'systemStatus'
         ));
     }
 
@@ -324,4 +348,5 @@ class UserController extends Controller
             'favoriteLocations'
         ));
     }
+
 }

@@ -4,7 +4,7 @@
 <div class="py-12">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="flex items-center mb-6">
-            <a href="{{ route('admin_dashboard') }}" class="text-indigo-600 hover:text-indigo-900 mr-4">
+            <a href="{{ route('owner_dashboard') }}" class="text-indigo-600 hover:text-indigo-900 mr-4">
                 <svg class="h-5 w-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                 </svg>
@@ -239,7 +239,7 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Monthly Revenue (€)',
+                    label: 'Monthly Revenue ($)',
                     data: values,
                     backgroundColor: 'rgba(79, 70, 229, 0.2)',
                     borderColor: 'rgba(79, 70, 229, 1)',
@@ -253,7 +253,7 @@
                         beginAtZero: true,
                         ticks: {
                             callback: function(value) {
-                                return '€' + value;
+                                return '$' + value;
                             }
                         }
                     }

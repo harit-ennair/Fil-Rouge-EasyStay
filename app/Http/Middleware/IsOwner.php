@@ -16,10 +16,10 @@ class IsOwner
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // if (Auth::check() && Auth::user()->role_id == 2) { // Assuming 2 is the role_id for owners
+         if (Auth::check() && Auth::user()->role_id == 2) { // Assuming 2 is the role_id for owners
             return $next($request);
-        // }
+         }
 
-        // return redirect('/login')->with('error', 'You do not have permission to access this page.');
+         return redirect('/login')->with('error', 'You do not have permission to access this page.');
     }
 }

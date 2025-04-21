@@ -102,7 +102,16 @@ class AppartementsController extends Controller
     {
         $appartement = appartements::findOrFail($id);
         $photos = photos::where('appartement_id', $id)->get();
-        $reservations = reservation::where('appartement_id', $id)->get();
+        
+        // Get the latest reservations for the apartment (used to be queried directly in the view)
+        $recentReservations = reservation::where('appartement_id', $appartement->id)
+            ->with('user')
+            ->take(4)
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        // Get the latest reservation for availability display
+        $latestReservation = $appartement->reservations()->orderBy('end_date', 'desc')->first();
 
         $similarAppartements = appartements::where('id', '!=', $appartement->id)
         ->where(function($query) use ($appartement) {
@@ -126,7 +135,7 @@ class AppartementsController extends Controller
         ->take(3)
         ->get();
         
-        return view('appartements_show', compact('appartement', 'photos', 'similarAppartements', 'reservations'));
+        return view('appartements_show', compact('appartement', 'photos', 'similarAppartements', 'recentReservations', 'latestReservation'));
     }
 
     /**
