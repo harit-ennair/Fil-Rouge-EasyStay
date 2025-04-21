@@ -59,10 +59,34 @@
                         </div>
                     </div>
                     
-                    <div class="animate-field" style="animation-delay: 0.3s">
+                    <!-- <div class="animate-field" style="animation-delay: 0.3s">
+                        <div class="mb-2">
+                            <input id="location-search" type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all" placeholder="Search for a location" @focus="currentField = 3">
+                        </div>
+                    </div> -->
+                    
+                    <!-- Map container with improved styling -->
+                    <div class="col-span-1 md:col-span-2">
                         <label class="block text-gray-700 font-medium mb-2">Location</label>
-                        <input id="location-input" type="text" name="location" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all" placeholder="Enter full address" @focus="currentField = 3">
-                        <!-- Hidden fields for coordinates -->
+                        <div id="map-container" class="w-full h-72 rounded-lg border border-gray-300 overflow-hidden shadow-inner transition-all hover:shadow-md"></div>
+                        <p class="mt-2 text-sm text-gray-500 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Click on the map to set the location or use the search above
+                        </p>
+                        
+                        <!-- Address display and hidden fields for coordinates -->
+                        <div class="mt-3 px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <div class="text-sm text-gray-700 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <span id="selected-address" class="font-medium">No location selected</span>
+                            </div>
+                        </div>
+                        <input type="hidden" name="location" id="location-input">
                         <input type="hidden" name="latitude" id="latitude">
                         <input type="hidden" name="longitude" id="longitude">
                     </div>
@@ -148,11 +172,12 @@
     // Initialize Google Places Autocomplete after the page loads
     document.addEventListener('DOMContentLoaded', function() {
         initAutocomplete();
+        initMap();
     });
 
     function initAutocomplete() {
         // Create the autocomplete object
-        const input = document.getElementById('location-input');
+        const input = document.getElementById('location-search');
         const options = {
             types: ['address'], // Restrict to addresses for accurate geocoding
             componentRestrictions: {}, // No country restriction
@@ -176,7 +201,53 @@
             document.getElementById('longitude').value = place.geometry.location.lng();
             
             // Set the location input to the full formatted address
-            input.value = place.formatted_address;
+            document.getElementById('location-input').value = place.formatted_address;
+            document.getElementById('selected-address').textContent = place.formatted_address;
+            
+            // Center the map on the selected place
+            map.setCenter(place.geometry.location);
+            marker.setPosition(place.geometry.location);
+        });
+    }
+
+    let map, marker;
+
+    function initMap() {
+        // Create the map
+        map = new google.maps.Map(document.getElementById('map-container'), {
+            center: { lat: -34.397, lng: 150.644 },
+            zoom: 8
+        });
+
+        // Create the marker
+        marker = new google.maps.Marker({
+            map: map,
+            draggable: true
+        });
+
+        // Add a click event listener to the map
+        map.addListener('click', function(event) {
+            const lat = event.latLng.lat();
+            const lng = event.latLng.lng();
+
+            // Set the marker position
+            marker.setPosition(event.latLng);
+
+            // Fill in the latitude and longitude fields
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
+
+            // Geocode the coordinates to get the address
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ location: event.latLng }, function(results, status) {
+                if (status === 'OK' && results[0]) {
+                    const address = results[0].formatted_address;
+                    document.getElementById('location-input').value = address;
+                    document.getElementById('selected-address').textContent = address;
+                } else {
+                    window.alert('Geocode was not successful for the following reason: ' + status);
+                }
+            });
         });
     }
 </script>
