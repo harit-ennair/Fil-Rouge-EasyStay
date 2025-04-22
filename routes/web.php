@@ -4,6 +4,7 @@ use App\Http\Controllers\AppartementsController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OwnerPropertiesController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,7 +35,7 @@ Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 Route::get('/', [AppartementsController::class, 'index'])->name('appartements_index');
 Route::get('/appartements', [AppartementsController::class, 'index'])->name('appartements_index');
 
-// Owner routes - for property owners
+// Owner routes
 // Route::middleware(['auth', 'is.owner'])->group(function () {
     Route::get('/appartements/create', [AppartementsController::class, 'create'])->name('appartements_create');
     Route::post('/appartements/store', [AppartementsController::class, 'store'])->name('appartements_store');
@@ -50,7 +51,7 @@ Route::get('/appartements', [AppartementsController::class, 'index'])->name('app
 // });
 
 Route::get('/appartements/{id}', [AppartementsController::class, 'show'])->name('appartements_show');
-// User routes - for standard users
+// User routes 
 // Route::middleware(['auth', 'is.client'])->group(function () {
     Route::post('/appartements/{id}/reserve', [ReservationController::class, 'store'])->name('appartements_reserve');
     Route::post('/appartements/{id}', [ReservationController::class, 'store'])->name('appartements_reservations');
@@ -75,3 +76,16 @@ Route::get('/appartements/{id}', [AppartementsController::class, 'show'])->name(
     Route::get('/all-properties', [AppartementsController::class, 'allProperties'])->name('all_properties');
 
 // });
+
+// Payment routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/payments/{reservationId}', [PaymentController::class, 'showPaymentForm'])->name('payments.form');
+    Route::post('/payments/{reservationId}/process', [PaymentController::class, 'processPayment'])->name('payments.process');
+    Route::get('/payments/{reservationId}/confirm', [PaymentController::class, 'confirmPayment'])->name('payments.confirm');
+});
+
+// Owner payment management routes (should be protected by owner middleware in production)
+Route::middleware(['auth'])->group(function () {
+    Route::post('/payments/{reservationId}/capture', [PaymentController::class, 'capturePayment'])->name('payments.capture');
+    Route::post('/payments/{reservationId}/cancel', [PaymentController::class, 'cancelPayment'])->name('payments.cancel');
+});

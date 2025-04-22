@@ -14,7 +14,12 @@ class reservation extends Model
         'start_date',
         'end_date',
         'total_price',
-        'status'
+        'status',
+        'payment_status',
+        'payment_method',
+        'payment_intent_id',
+        'stripe_customer_id',
+        'paid_at'
     ];
     public function appartement()
     {
