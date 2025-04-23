@@ -5,6 +5,7 @@ use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OwnerPropertiesController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\CategoriesController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -74,6 +75,14 @@ Route::get('/appartements/{id}', [AppartementsController::class, 'show'])->name(
     Route::get('/clients/{id}/profile', [UserController::class, 'ClientProfile'])->name('client_profile');
     Route::get('/admin/all-properties', [AppartementsController::class, 'allProperties'])->name('admin.all-properties');
     Route::get('/all-properties', [AppartementsController::class, 'allProperties'])->name('all_properties');
+
+    // Categories routes
+    Route::get('/categories', [CategoriesController::class, 'index'])->name('categories.index');
+    Route::get('/categories/create', [CategoriesController::class, 'create'])->name('categories.create');
+    Route::post('/categories', [CategoriesController::class, 'store'])->name('categories.store');
+    Route::get('/categories/{category}/edit', [CategoriesController::class, 'edit'])->name('categories.edit');
+    Route::put('/categories/{category}', [CategoriesController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{category}', [CategoriesController::class, 'destroy'])->name('categories.destroy');
 
 // });
 
