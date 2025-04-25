@@ -18,7 +18,7 @@ class OwnerPropertiesController extends Controller
 
         // $appartements = appartements::where('user_id', $user->id)->get();
         
-        // Get the owner's properties with their photos
+        // Get the owners properties with their photos
         $properties = appartements::where('user_id', $user->id)
                         ->with('photos', 'categories', 'reservations')
                         ->get();
@@ -31,8 +31,6 @@ class OwnerPropertiesController extends Controller
             // Calculate total revenue for this property
             $property->totalRevenue = $property->reservations->where('status', 'confirmed')->sum('total_price');
             
-            // Calculate average rating if you had a rating system
-            // $property->averageRating = ...
         }
         
         return view('owner_properties', compact('properties', 'user'));

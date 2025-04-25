@@ -349,4 +349,16 @@ class UserController extends Controller
         ));
     }
 
+    public function allOwner()
+    {
+        $owners = User::where('role_id', 2)->get();
+        return view('all-owners', compact('owners'));
+    }
+
+    public function allClients()
+    {
+        $clients = User::where('role_id', 3)->get();
+        return view('all-clients', compact('clients'));
+    }
 }
+

@@ -19,25 +19,20 @@ class PaymentController extends Controller
     }
 
     /**
-     * Show payment form for a reservation
-     *
-     * @param int $reservationId
-     * @return \Illuminate\View\View
+     * Show payment form
      */
     public function showPaymentForm($reservationId)
     {
         $reservation = reservation::findOrFail($reservationId);
         
-        // Check if the reservation belongs to the authenticated user
         if ($reservation->user_id !== Auth::id()) {
             return redirect()->route('reservations.index')
-                ->with('error', 'You are not authorized to pay for this reservation.');
+                ->with('error', 'Not authorized to pay for this reservation.');
         }
         
-        // If the reservation is not pending, redirect with message
         if ($reservation->status !== 'pending') {
             return redirect()->route('reservations.index')
-                ->with('error', 'This reservation cannot be paid for at this time.');
+                ->with('error', 'This reservation cannot be paid now.');
         }
         
         return view('payments.form', [
@@ -47,28 +42,21 @@ class PaymentController extends Controller
     }
 
     /**
-     * Process payment for a reservation
-     *
-     * @param Request $request
-     * @param int $reservationId
-     * @return \Illuminate\Http\JsonResponse
+     * Process payment
      */
     public function processPayment(Request $request, $reservationId)
     {
         $reservation = reservation::findOrFail($reservationId);
         
-        // Check if the reservation belongs to the authenticated user
         if ($reservation->user_id !== Auth::id()) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
         
-        // Validate payment information
         $request->validate([
             'payment_method' => 'required|string',
         ]);
         
         try {
-            // Create payment intent
             $paymentData = $this->stripeService->createPaymentIntent(
                 $reservation, 
                 ['payment_method' => $request->payment_method]
@@ -76,78 +64,60 @@ class PaymentController extends Controller
             
             return response()->json($paymentData);
         } catch (\Exception $e) {
-            Log::error('Payment processing error: ' . $e->getMessage());
-            return response()->json(['error' => 'Payment processing failed'], 500);
+            Log::error('Payment error: ' . $e->getMessage());
+            return response()->json(['error' => 'Payment failed'], 500);
         }
     }
 
     /**
-     * Confirm payment completion
-     *
-     * @param Request $request
-     * @param int $reservationId
-     * @return \Illuminate\View\View
+     * Confirm payment
      */
     public function confirmPayment(Request $request, $reservationId)
     {
         $reservation = reservation::findOrFail($reservationId);
         
-        // Check if the reservation belongs to the authenticated user
         if ($reservation->user_id !== Auth::id()) {
             return redirect()->route('reservations.index')
-                ->with('error', 'You are not authorized to view this payment.');
+                ->with('error', 'Not authorized for this payment.');
         }
         
         try {
-            // Get payment intent from query string
             $paymentIntentId = $request->query('payment_intent');
             
-            if ($paymentIntentId) {
-                // Update payment intent ID if not already set
-                if (!$reservation->payment_intent_id) {
-                    $reservation->update(['payment_intent_id' => $paymentIntentId]);
-                }
-                
-                $success = $this->stripeService->confirmPayment($reservation);
-                
-                if ($success) {
-                    return view('payments.confirmation', [
-                        'reservation' => $reservation->fresh(),
-                        'success' => true
-                    ])->with('success', 'Payment authorized successfully! Your card will only be charged after the owner confirms your reservation.');
-                }
+            if ($paymentIntentId && !$reservation->payment_intent_id) {
+                $reservation->update(['payment_intent_id' => $paymentIntentId]);
             }
             
-            // If we reach here, payment was not successful or still processing
+            if ($paymentIntentId && $this->stripeService->confirmPayment($reservation)) {
+                return view('payments.confirmation', [
+                    'reservation' => $reservation->fresh(),
+                    'success' => true
+                ])->with('success', 'Payment authorized successfully!');
+            }
+            
             return view('payments.confirmation', [
                 'reservation' => $reservation,
                 'success' => false
-            ])->with('error', 'Payment authorization is still processing or was not successful. Please contact support if this persists.');
+            ])->with('error', 'Payment not successful. Please contact support.');
             
         } catch (\Exception $e) {
-            Log::error('Payment confirmation error: ' . $e->getMessage());
+            Log::error('Payment error: ' . $e->getMessage());
             return view('payments.confirmation', [
                 'reservation' => $reservation,
                 'success' => false
-            ])->with('error', 'There was an error confirming your payment authorization. Please contact support.');
+            ])->with('error', 'Payment error. Please contact support.');
         }
     }
 
     /**
-     * Handle payment after owner confirmation
-     *
-     * @param int $reservationId
-     * @return \Illuminate\Http\JsonResponse
+     * Capture payment after approval
      */
     public function capturePayment($reservationId)
     {
-        // This should be called by the owner through a webhook or after accepting the reservation
         $reservation = reservation::findOrFail($reservationId);
         
         try {
-            $success = $this->stripeService->capturePayment($reservation);
-            
-            if ($success) {
+            if ($this->stripeService->capturePayment($reservation)) {
                 return response()->json([
                     'success' => true, 
                     'message' => 'Payment captured successfully'
@@ -159,29 +129,23 @@ class PaymentController extends Controller
                 'message' => 'Payment capture failed'
             ], 400);
         } catch (\Exception $e) {
-            Log::error('Payment capture error: ' . $e->getMessage());
-            return response()->json(['error' => 'Payment capture failed'], 500);
+            Log::error('Payment error: ' . $e->getMessage());
+            return response()->json(['error' => 'Payment failed'], 500);
         }
     }
 
     /**
-     * Cancel payment for a declined reservation
-     *
-     * @param int $reservationId
-     * @return \Illuminate\Http\JsonResponse
+     * Cancel payment
      */
     public function cancelPayment($reservationId)
     {
-        // This should be called when a reservation is declined
         $reservation = reservation::findOrFail($reservationId);
         
         try {
-            $success = $this->stripeService->cancelPayment($reservation);
-            
-            if ($success) {
+            if ($this->stripeService->cancelPayment($reservation)) {
                 return response()->json([
                     'success' => true, 
-                    'message' => 'Payment cancelled successfully'
+                    'message' => 'Payment cancelled'
                 ]);
             }
             
@@ -190,8 +154,8 @@ class PaymentController extends Controller
                 'message' => 'Payment cancellation failed'
             ], 400);
         } catch (\Exception $e) {
-            Log::error('Payment cancellation error: ' . $e->getMessage());
-            return response()->json(['error' => 'Payment cancellation failed'], 500);
+            Log::error('Payment error: ' . $e->getMessage());
+            return response()->json(['error' => 'Cancellation failed'], 500);
         }
     }
 }

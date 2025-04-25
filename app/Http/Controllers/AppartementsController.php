@@ -50,7 +50,7 @@ class AppartementsController extends Controller
      */
     public function create()
     {
-        
+
         $categories = categories::all();
         return view('appartements_create', compact('categories'));
     }
