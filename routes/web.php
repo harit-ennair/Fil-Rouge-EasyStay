@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AppartementsController;
+use App\Http\Controllers\ClientController;
+use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OwnerPropertiesController;
@@ -18,11 +21,6 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-
 
 // Public routes
 Route::get('/login', [UserController::class, 'login'])->name('login');
@@ -42,11 +40,12 @@ Route::get('/appartements', [AppartementsController::class, 'index'])->name('app
 // Admin routes
 Route::middleware(['is.admin'])->group(function () {
     
-    Route::get('/dashboard', [UserController::class, 'dashboard'])->name('admin_dashboard');
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin_dashboard');
     
     // user routes
-    Route::get('/allOwner', [UserController::class, 'allOwner'])->name('allOwner');
-    Route::get('/allClients', [UserController::class, 'allClients'])->name('allClients');
+    Route::get('/allOwner', [OwnerController::class, 'index'])->name('allOwner');
+    Route::get('/allClients', [ClientController::class, 'index'])->name('allClients');
+    Route::get('/users/{id}/delete', [AdminController::class, 'deleteUser'])->name('user_delete');
     
     //apprtements routes
     Route::get('/admin/all-properties', [AppartementsController::class, 'allProperties'])->name('admin.all-properties');
@@ -68,7 +67,7 @@ Route::middleware(['is.admin'])->group(function () {
 Route::middleware(['is.owner'])->group(function () {
     
     // owner routes
-    Route::get('/ownerDashboard', [UserController::class, 'ownerDashboard'])->name('owner_dashboard');
+    Route::get('/ownerDashboard', [OwnerController::class, 'dashboard'])->name('owner_dashboard');
     
     //appartements routes
     
@@ -86,7 +85,7 @@ Route::middleware(['is.owner'])->group(function () {
     
     
     // user routes
-    Route::get('/owners/{id}/profile', [UserController::class, 'showProfile'])->name('owner_profile');
+    Route::get('/owners/{id}/profile', [OwnerController::class, 'show'])->name('owner_profile');
     
     // reservation routes
     Route::post('/appartements/{id}/reserve', [ReservationController::class, 'store'])->name('appartements_reserve');
@@ -100,7 +99,7 @@ Route::get('/appartements/{id}', [AppartementsController::class, 'show'])->name(
     // User routes 
     Route::middleware(['is.client'])->group(function () {
     // user routes
-    Route::get('/clients/{id}/profile', [UserController::class, 'ClientProfile'])->name('client_profile');
+    Route::get('/clients/{id}/profile', [ClientController::class, 'show'])->name('client_profile');
     
     //appartements routes
     Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations');
@@ -122,7 +121,6 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/users', [UserController::class, 'users'])->name('users');
             Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('user_edit');
             Route::post('/users/{id}/update', [UserController::class, 'update'])->name('user_update');
-            Route::get('/users/{id}/delete', [UserController::class, 'delete'])->name('user_delete');
             Route::get('/payments/{reservationId}', [PaymentController::class, 'showPaymentForm'])->name('payments.form');
             Route::post('/payments/{reservationId}/process', [PaymentController::class, 'processPayment'])->name('payments.process');
             Route::get('/payments/{reservationId}/confirm', [PaymentController::class, 'confirmPayment'])->name('payments.confirm');
