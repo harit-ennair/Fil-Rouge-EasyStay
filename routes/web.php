@@ -80,44 +80,40 @@ Route::middleware(['is.owner'])->group(function () {
     Route::post('/reservations/{id}/decline', [ReservationController::class, 'decline'])->name('reservation.decline');
     Route::get('/owner/properties', [OwnerPropertiesController::class, 'index'])->name('owner.properties');
     Route::get('/owner/properties/{id}/delete', [OwnerPropertiesController::class, 'delete'])->name('owner.properties.delete');
-    Route::post('/appartements/{id}/reserve', [ReservationController::class, 'store'])->name('appartements_reserve');
-    Route::post('/appartements/{id}', [ReservationController::class, 'store'])->name('appartements_reservations');
+
     
     
     // user routes
     Route::get('/owners/{id}/profile', [OwnerController::class, 'show'])->name('owner_profile');
     
     // reservation routes
-    Route::post('/appartements/{id}/reserve', [ReservationController::class, 'store'])->name('appartements_reserve');
-    Route::post('/appartements/{id}', [ReservationController::class, 'store'])->name('appartements_reservations');
+
 });
 
 
-Route::get('/appartements/{id}', [AppartementsController::class, 'show'])->name('appartements_show');
+     Route::get('/appartements/{id}', [AppartementsController::class, 'show'])->name('appartements_show');
 
 
-    // User routes 
-    Route::middleware(['is.client'])->group(function () {
+
+
+
+
+Route::middleware(['is.client'])->group(function () {
     // user routes
     Route::get('/clients/{id}/profile', [ClientController::class, 'show'])->name('client_profile');
-    
-    //appartements routes
-    Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations');
-    Route::get('/reservations/{id}/edit', [ReservationController::class, 'edit'])->name('reservation_edit');
-    Route::post('/reservations/{id}/update', [ReservationController::class, 'update'])->name('reservation_update');
-    Route::get('/reservations/{id}/delete', [ReservationController::class, 'delete'])->name('reservation_delete');
-    Route::get('/appartements/{id}/approve', [AppartementsController::class, 'approve'])->name('appartements_approve');
-    Route::get('/appartements/{id}/reject', [AppartementsController::class, 'reject'])->name('appartements_reject');
 
-    // reservation routes
-    Route::post('/payments/{reservationId}/capture', [PaymentController::class, 'capturePayment'])->name('payments.capture');
-    Route::post('/payments/{reservationId}/cancel', [PaymentController::class, 'cancelPayment'])->name('payments.cancel');
 });
 
 
 // auth routes
 Route::middleware(['auth'])->group(function () {
-        
+
+
+            Route::post('/appartements/{id}/reserve', [ReservationController::class, 'store'])->name('appartements_reserve');
+            Route::post('/appartements/{id}', [ReservationController::class, 'store'])->name('appartements_reservations');
+            Route::post('/payments/{reservationId}/capture', [PaymentController::class, 'capturePayment'])->name('payments.capture');
+            Route::post('/payments/{reservationId}/cancel', [PaymentController::class, 'cancelPayment'])->name('payments.cancel');
+            Route::get('/reservations', [ReservationController::class, 'store'])->name('reservations');
             Route::get('/users', [UserController::class, 'users'])->name('users');
             Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('user_edit');
             Route::post('/users/{id}/update', [UserController::class, 'update'])->name('user_update');
@@ -126,9 +122,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/payments/{reservationId}/confirm', [PaymentController::class, 'confirmPayment'])->name('payments.confirm');
     });
 
-// Owner payment management routes (should be protected by owner middleware in production)
-Route::middleware(['auth'])->group(function () {
-});
+
 
 
 
