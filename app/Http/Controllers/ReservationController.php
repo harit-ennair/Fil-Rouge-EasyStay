@@ -77,9 +77,9 @@ class ReservationController extends Controller
         $reservation->appartement_id = $request->appartement_id;
         $reservation->start_date = $request->start_date;
         $reservation->end_date = $request->end_date;
-        $reservation->total_price = $totalPrice; // Use calculated price instead of request value
-        $reservation->status = 'pending'; // default status
-        $reservation->payment_status = 'pending'; // default payment status
+        $reservation->total_price = $totalPrice;
+        $reservation->status = 'pending';
+        $reservation->payment_status = 'pending';
         $reservation->save();
 
         // Get the owner of the apartment and send notification
