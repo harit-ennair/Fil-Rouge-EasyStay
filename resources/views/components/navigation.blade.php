@@ -11,15 +11,6 @@
                     <a href="{{ route('appartements_index') }}" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                         Home
                     </a>
-                    <!-- <a href="#" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                        Explore
-                    </a>
-                    <a href="#" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                        About
-                    </a>
-                    <a href="#" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                        Contact
-                    </a> -->
                 </div>
             </div>
             
@@ -44,22 +35,17 @@
                              class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
                              style="display: none;">
                             
-                            @if(auth()->user() && auth()->user()->role_id == 1)
-                            <a href="{{ route('admin_dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</a>
-                            @endif
-                            
-                            @if(auth()->user() && auth()->user()->role_id == 2)
-                                <a href="{{ route('owner_dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Owner Portal</a>
-                            @endif
-
-                            @if(auth()->user() && auth()->user()->role_id == 2)
+                            @if(auth()->user()->role_id == 1)
+                                <a href="{{ route('admin_dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</a>
                                 <a href="{{ route('owner_profile', ['id' => auth()->user()->id]) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
-                            @elseif(auth()->user())
+                                <a href="{{ route('owner_dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Owner Portal</a>
+                            @elseif(auth()->user()->role_id == 2)
+                                <a href="{{ route('owner_dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Owner Portal</a>
+                                <a href="{{ route('owner_profile', ['id' => auth()->user()->id]) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                            @elseif(auth()->user()->role_id == 3)
                                 <a href="{{ route('client_profile', ['id' => auth()->user()->id]) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
                             @endif
                             
-                            <!-- <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Trips</a> -->
                             <div class="border-t border-gray-100"></div>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
@@ -76,7 +62,6 @@
                         <a href="{{ route('register') }}" class="bg-gradient-to-r from-teal-500 to-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-teal-600 hover:to-blue-600 transition shadow-sm">
                             Sign Up
                         </a>
-                        
                     </div>
                 @endauth
             </div>
@@ -98,15 +83,6 @@
                                 <a href="{{ route('appartements_index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100">
                                     Home
                                 </a>
-                                <!-- <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100">
-                                    Explore
-                                </a>
-                                <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100">
-                                    About
-                                </a>
-                                <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-100">
-                                    Contact
-                                </a> -->
                             </div>
                             
                             @auth
@@ -121,36 +97,29 @@
                                         </div>
                                     </div>
                                     <div class="mt-3 space-y-1">
-                            
-                                        
-                                        @if(auth()->user() && auth()->user()->role_id == 1)
-                                        <a href="{{ route('admin_dashboard') }}" class="block px-4 py-2 text-base font-medium text-gray-900 hover:bg-gray-100">
-                                            Dashboard
-                                        </a>
-                                        <a href="{{ route('owner_profile', ['id' => auth()->user()->id]) }}" class="block px-4 py-2 text-base font-medium text-gray-900 hover:bg-gray-100">
-                                            Profile
-                                        </a>
-                                        @endif
-                                        @if(auth()->user() && auth()->user()->role_id == 2)
+                                        @if(auth()->user()->role_id == 1)
+                                            <a href="{{ route('admin_dashboard') }}" class="block px-4 py-2 text-base font-medium text-gray-900 hover:bg-gray-100">
+                                                Dashboard
+                                            </a>
+                                            <a href="{{ route('owner_profile', ['id' => auth()->user()->id]) }}" class="block px-4 py-2 text-base font-medium text-gray-900 hover:bg-gray-100">
+                                                Profile
+                                            </a>
+                                            <a href="{{ route('owner_dashboard') }}" class="block px-4 py-2 text-base font-medium text-gray-900 hover:bg-gray-100">
+                                                Owner Portal
+                                            </a>
+                                        @elseif(auth()->user()->role_id == 2)
                                             <a href="{{ route('owner_dashboard') }}" class="block px-4 py-2 text-base font-medium text-gray-900 hover:bg-gray-100">
                                                 Owner Portal
                                             </a>
                                             <a href="{{ route('owner_profile', ['id' => auth()->user()->id]) }}" class="block px-4 py-2 text-base font-medium text-gray-900 hover:bg-gray-100">
                                                 Profile
                                             </a>
-                                        @endif
-                                        @if(auth()->user() && auth()->user()->role_id == 3)
+                                        @elseif(auth()->user()->role_id == 3)
                                             <a href="{{ route('client_profile', ['id' => auth()->user()->id]) }}" class="block px-4 py-2 text-base font-medium text-gray-900 hover:bg-gray-100">
                                                 Profile
                                             </a>
                                         @endif
                                         
-                                        <a href="#" class="block px-4 py-2 text-base font-medium text-gray-900 hover:bg-gray-100">
-                                            Settings
-                                        </a>
-                                        <a href="#" class="block px-4 py-2 text-base font-medium text-gray-900 hover:bg-gray-100">
-                                            Your Trips
-                                        </a>
                                         <form method="POST" action="{{ route('logout') }}">
                                             @csrf
                                             <button type="submit" class="block w-full text-left px-4 py-2 text-base font-medium text-red-600 hover:bg-gray-100">
