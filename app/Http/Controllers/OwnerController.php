@@ -36,7 +36,7 @@ class OwnerController extends Controller
             round(($activeBookings / $totalProperties) * 100) : 0;
         
         // Get most recent bookings
-        $recentBookings = $ownerReservations->sortByDesc('created_at')->take(5);
+        $recentBookings = $ownerReservations->sortByDesc('status')->take(5);
         
         return view('ownerdashboard', compact(
             'user', 

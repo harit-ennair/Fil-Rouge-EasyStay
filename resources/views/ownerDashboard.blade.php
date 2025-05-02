@@ -255,7 +255,7 @@
                             </div>
                             <div class="w-full bg-gray-200 rounded-full h-2.5">
                                 @php
-                                    $targetRevenue = 5000; // Example target
+                                    $targetRevenue = 5000;
                                     $revenuePercentage = min(100, ($monthlyRevenue / $targetRevenue) * 100);
                                 @endphp
                                 <div class="bg-green-600 h-2.5 rounded-full" style="width: {{ $revenuePercentage }}%"></div>
