@@ -134,17 +134,7 @@
                                 title: "{{ $appartement->title }}"
                             });
                             
-                            // Add info window
-                            const infoWindow = new google.maps.InfoWindow({
-                                content: "<strong>{{ $appartement->title }}</strong>"
-                            });
                             
-                            marker.addListener("click", () => {
-                                infoWindow.open(map, marker);
-                            });
-                            
-                            // Open info window by default
-                            infoWindow.open(map, marker);
                         @else
                             // Default coordinates (fallback)
                             const defaultPosition = { lat: 48.8566, lng: 2.3522 };
@@ -173,17 +163,7 @@
                                         title: "{{ $appartement->title }}"
                                     });
                                     
-                                    // Add info window
-                                    const infoWindow = new google.maps.InfoWindow({
-                                        content: "<strong>{{ $appartement->title }}</strong>"
-                                    });
                                     
-                                    marker.addListener("click", () => {
-                                        infoWindow.open(map, marker);
-                                    });
-                                    
-                                    // Open info window by default
-                                    infoWindow.open(map, marker);
                                 }
                             });
                         @endif

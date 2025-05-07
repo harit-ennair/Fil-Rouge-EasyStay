@@ -44,7 +44,7 @@ class ReservationController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate the incoming request
+    
         $validator = Validator::make($request->all(), [
             'appartement_id' => 'required|exists:appartements,id',
             'start_date' => 'required|date|after_or_equal:today',
@@ -60,18 +60,15 @@ class ReservationController extends Controller
         // Get the apartment details to calculate price
         $appartement = appartements::findOrFail($request->appartement_id);
         
-        // Calculate total price based on number of days and apartment price
         $startDate = Carbon::parse($request->start_date);
         $endDate = Carbon::parse($request->end_date);
         $days = $endDate->diffInDays($startDate);
         
-        // Make sure we have at least 1 day
+        // Max ben 1 o days
         $days = max(1, $days);
         
-        // Calculate total price
         $totalPrice = $appartement->price * $days;
         
-        // Create the reservation
         $reservation = new Reservation();
         $reservation->user_id = auth()->user()->id;
         $reservation->appartement_id = $request->appartement_id;
@@ -130,7 +127,7 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::findOrFail($id);
         
-        // Check if the authenticated user owns the apartment
+
         $appartement = $reservation->appartement;
         if ($appartement->user_id != auth()->id()) {
             return redirect()->back()->with('error', 'You are not authorized to confirm this reservation.');
@@ -139,18 +136,18 @@ class ReservationController extends Controller
         $reservation->status = 'confirmed';
         $reservation->save();
         
-        // Capture the payment if it's in authorized state
+
         if ($reservation->payment_status === 'authorized' && $reservation->payment_intent_id) {
             $captureResult = $this->stripeService->capturePayment($reservation);
             
             if ($captureResult) {
-                // Notify the client about the confirmation and payment
+            
                 $client = User::find($reservation->user_id);
                 $client->notify(new ReservationConfirmedNotification($reservation));
                 
                 return redirect()->back()->with('success', 'Reservation confirmed and payment processed successfully. The client has been notified.');
             } else {
-                // If payment capture failed, still confirm but notify about payment issue
+ 
                 $client = User::find($reservation->user_id);
                 $client->notify(new ReservationConfirmedNotification($reservation));
                 
@@ -158,7 +155,7 @@ class ReservationController extends Controller
             }
         }
         
-        // If no payment to capture or payment already captured
+
         $client = User::find($reservation->user_id);
         $client->notify(new ReservationConfirmedNotification($reservation));
         
@@ -172,7 +169,7 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::findOrFail($id);
         
-        // Check if the authenticated user owns the apartment
+
         $appartement = $reservation->appartement;
         if ($appartement->user_id != auth()->id()) {
             return redirect()->back()->with('error', 'You are not authorized to decline this reservation.');
@@ -181,12 +178,12 @@ class ReservationController extends Controller
         $reservation->status = 'cancelled';
         $reservation->save();
 
-        // Cancel and refund the payment if needed
+        // Cancel paymen
         if ($reservation->payment_status === 'paid' || $reservation->payment_intent_id) {
             $this->stripeService->cancelPayment($reservation);
         }
         
-        // Notify the client about the decline
+        // Notify
         $client = User::find($reservation->user_id);
         $client->notify(new ReservationDeclinedNotification($reservation));
         

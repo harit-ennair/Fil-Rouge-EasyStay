@@ -10,7 +10,7 @@ use App\Repositories\Interfaces\ClientRepositoryInterface;
 class ClientRepository implements ClientRepositoryInterface
 {
     /**
-     * Get all clients
+     * all clients
      * 
      * @return \Illuminate\Database\Eloquent\Collection
      */
@@ -20,36 +20,36 @@ class ClientRepository implements ClientRepositoryInterface
     }
 
     /**
-     * Get client by ID with statistics
+     * client statistics
      * 
      * @param int $id
      * @return array
      */
     public function getClientWithStats($id)
     {
-        // Find the user
+
         $client = User::findOrFail($id);
         
-        // Verify this is a client
+
         $clientRole = Role::where('name', 'client')->first();
         if ($client->role_id !== $clientRole->id) {
             return ['error' => 'User is not a client'];
         }
         
-        // Get all the client's reservations with related data
+        // all client reservations 
         $reservations = reservation::where('user_id', $client->id)
             ->with(['appartement'])
             ->orderBy('created_at', 'desc')
             ->get();
         
-        // Calculate statistics
+        // statistics
         $totalSpent = $reservations->sum('total_price');
         $totalBookings = $reservations->count();
         $confirmedBookings = $reservations->where('status', 'confirmed')->count();
         $pendingBookings = $reservations->where('status', 'pending')->count();
         $cancelledBookings = $reservations->where('status', 'cancelled')->count();
         
-        // Calculate monthly spending for the last 6 months
+        // last 6 months
         $monthlySpending = [];
         for ($i = 0; $i < 6; $i++) {
             $month = now()->subMonths($i);
@@ -61,15 +61,11 @@ class ClientRepository implements ClientRepositoryInterface
             $monthlySpending[$month->format('M Y')] = $spending;
         }
         
-        // Convert to JSON for chart
+        // JSON for chart
         $monthlySpendingJson = json_encode(array_reverse($monthlySpending));
         
-        // Get unique destinations (locations) visited
-        $visitedLocations = $reservations->map(function($reservation) {
-            return $reservation->appartement->location ?? 'Unknown';
-        })->unique()->values();
-        
-        // Get favorite destinations (most booked)
+
+        // destinations most booked
         $favoriteLocations = $reservations
             ->groupBy(function($reservation) {
                 return $reservation->appartement->location ?? 'Unknown';
@@ -89,7 +85,6 @@ class ClientRepository implements ClientRepositoryInterface
             'pendingBookings' => $pendingBookings,
             'cancelledBookings' => $cancelledBookings,
             'monthlySpendingJson' => $monthlySpendingJson,
-            'visitedLocations' => $visitedLocations,
             'favoriteLocations' => $favoriteLocations
         ];
     }

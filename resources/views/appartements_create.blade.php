@@ -59,11 +59,7 @@
                         </div>
                     </div>
                     
-                    <!-- <div class="animate-field" style="animation-delay: 0.3s">
-                        <div class="mb-2">
-                            <input id="location-search" type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all" placeholder="Search for a location" @focus="currentField = 3">
-                        </div>
-                    </div> -->
+     
                     
                     <!-- Map container with improved styling -->
                     <div class="col-span-1 md:col-span-2">
@@ -171,52 +167,17 @@
 <script>
     // Initialize Google Places Autocomplete after the page loads
     document.addEventListener('DOMContentLoaded', function() {
-        initAutocomplete();
         initMap();
     });
-
-    function initAutocomplete() {
-        // Create the autocomplete object
-        const input = document.getElementById('location-search');
-        const options = {
-            types: ['address'], // Restrict to addresses for accurate geocoding
-            componentRestrictions: {}, // No country restriction
-            fields: ['address_components', 'geometry', 'formatted_address'] // What fields to return
-        };
-        
-        const autocomplete = new google.maps.places.Autocomplete(input, options);
-        
-        // When a place is selected, fill in the coordinate fields
-        autocomplete.addListener('place_changed', function() {
-            const place = autocomplete.getPlace();
-            
-            if (!place.geometry) {
-                // User entered the name of a place that was not suggested
-                window.alert("No details available for input: '" + place.name + "'");
-                return;
-            }
-            
-            // Fill in the latitude and longitude fields
-            document.getElementById('latitude').value = place.geometry.location.lat();
-            document.getElementById('longitude').value = place.geometry.location.lng();
-            
-            // Set the location input to the full formatted address
-            document.getElementById('location-input').value = place.formatted_address;
-            document.getElementById('selected-address').textContent = place.formatted_address;
-            
-            // Center the map on the selected place
-            map.setCenter(place.geometry.location);
-            marker.setPosition(place.geometry.location);
-        });
-    }
+  
 
     let map, marker;
 
     function initMap() {
         // Create the map
         map = new google.maps.Map(document.getElementById('map-container'), {
-            center: { lat: -34.397, lng: 150.644 },
-            zoom: 8
+            center: { lat: 31.633798620479144, lng: -8.009033203125 },
+            zoom: 4
         });
 
         // Create the marker

@@ -69,7 +69,7 @@
             </div>
             
             <div class="mt-4 flex flex-wrap gap-2">
-                <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"> hose</span>
+                <!-- <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"> hose</span> -->
                 @if($appartement->categories && $appartement->categories->count() > 0)
                     @foreach($appartement->categories as $category)
                         <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">{{ $category->name }}</span>

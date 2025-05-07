@@ -8,7 +8,7 @@ use App\Models\photos;
 use App\Models\reservation;
 use App\Services\GeocodingService;
 use Illuminate\Http\Request;
-use App\Http\Requests\UpdateappartementsRequest;
+
 
 class AppartementsController extends Controller
 {
@@ -19,9 +19,7 @@ class AppartementsController extends Controller
         $this->geocodingService = $geocodingService;
     }
 
-    /**
-     * Display a listing of the resource.
-     */
+// surch
     public function index()
     {
         $appartements = appartements::paginate(9);
@@ -45,9 +43,6 @@ class AppartementsController extends Controller
 
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
 
@@ -67,7 +62,7 @@ class AppartementsController extends Controller
             'location' => 'required',
         ]);
         
-        // Get coordinates from the address using Google Maps Geocoding API
+        // address Google Maps 
         $coordinates = $this->geocodingService->geocode($request->location);
         
         $app = appartements::create([
@@ -95,52 +90,45 @@ class AppartementsController extends Controller
         return redirect()->route('appartements_index')->with('success', 'Appartement created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show($id)
     {
         $appartement = appartements::findOrFail($id);
         $photos = photos::where('appartement_id', $id)->get();
         
-        // Get the latest reservations for the apartment (used to be queried directly in the view)
+        // latest reservations  
         $recentReservations = reservation::where('appartement_id', $appartement->id)
             ->with('user')
             ->take(4)
             ->orderBy('created_at', 'desc')
             ->get();
             
-        // Get the latest reservation for availability display
         $latestReservation = $appartement->reservations()->orderBy('end_date', 'desc')->first();
 
+        // apartments with similar location or categories
         $similarAppartements = appartements::where('id', '!=', $appartement->id)
         ->where(function($query) use ($appartement) {
-            // First try to find by location
             $locationQuery = clone $query;
             $locationQuery->where('location', $appartement->location);
             
-            // Check if apartments with same location exist
+
             if (appartements::where('id', '!=', $appartement->id)
             ->where('location', $appartement->location)->exists()) {
             $query->where('location', $appartement->location);
             } 
-            // If no apartments found by location, search by categories
+
             elseif ($appartement->categories->isNotEmpty()) {
             $query->whereHas('categories', function($subQuery) use ($appartement) {
                 $subQuery->whereIn('categories.id', $appartement->categories->pluck('id'));
             });
             }
         })
-        
         ->take(3)
         ->get();
         
         return view('appartements_show', compact('appartement', 'photos', 'similarAppartements', 'recentReservations', 'latestReservation'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+
     public function edit($id)
     {
         $appartements = appartements::findOrFail($id);
@@ -148,9 +136,7 @@ class AppartementsController extends Controller
         return view('appartements_edit', compact('appartements', 'categories'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update(Request $request, $id)
     {
         $appartements = appartements::findOrFail($id);
@@ -162,7 +148,7 @@ class AppartementsController extends Controller
             'location' => 'required',
         ]);
 
-        // Only geocode if the location has changed
+ 
         if ($appartements->location !== $request->location) {
             $coordinates = $this->geocodingService->geocode($request->location);
             $request->merge([
@@ -176,9 +162,7 @@ class AppartementsController extends Controller
         return redirect()->route('appartements_index')->with('success', 'Appartement updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy(appartements $appartements)
     {
         $appartements->delete();
@@ -186,25 +170,21 @@ class AppartementsController extends Controller
         return redirect()->route('appartements_index')->with('success', 'Appartement deleted successfully.');
     }
 
-    /**
-     * Display all properties for admin
-     */
+
     public function allProperties()
     {
-        // Get all properties with their photos, categories, reservations and owner information
+        // all properties and owner 
         $properties = appartements::with(['photos', 'categories', 'reservations', 'user'])
                         ->orderBy('created_at', 'desc')
                         ->paginate(15);
         
-        // Calculate statistics for each property
+        // statistics for each property
         foreach ($properties as $property) {
-            // Calculate the number of active reservations
+        
             $property->activeReservations = $property->reservations->where('status', 'confirmed')->count();
             
-            // Calculate total revenue for this property
             $property->totalRevenue = $property->reservations->where('status', 'confirmed')->sum('total_price');
             
-            // Calculate occupancy rate (if applicable)
             $totalDays = now()->diffInDays($property->created_at);
             $bookedDays = $property->reservations->where('status', 'confirmed')
                 ->sum(function($reservation) {
@@ -215,11 +195,10 @@ class AppartementsController extends Controller
             $property->occupancyRate = $totalDays > 0 ? round(($bookedDays / $totalDays) * 100) : 0;
         }
 
-        // Get property owners for the filter dropdown
+        // user with properties
         $owners = \App\Models\User::whereHas('appartements')->get();
         
-        // Use top rated or most booked properties instead of featured
-        // since the 'featured' column doesn't exist
+        // top booked properties
         $featuredCount = appartements::withCount(['reservations' => function($query) {
                            $query->where('status', 'confirmed');
                         }])
@@ -229,7 +208,7 @@ class AppartementsController extends Controller
         // Get total active bookings 
         $activeBookingsCount = reservation::where('status', 'confirmed')->count();
         
-        // Calculate total revenue from all properties
+        // revenue from all properties
         $totalRevenue = reservation::where('status', 'confirmed')->sum('total_price');
         
         // Get top performing properties
@@ -249,7 +228,7 @@ class AppartementsController extends Controller
                             ->orderByDesc('appartements_count')
                             ->get();
         
-        // Get total properties count
+        // total properties 
         $propertiesCount = appartements::count();
         
         return view('all_properties', compact(

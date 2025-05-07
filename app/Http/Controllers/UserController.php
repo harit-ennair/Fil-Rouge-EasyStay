@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 class UserController extends Controller
 {
     /**
-     * Display login form
+     * login form
      */
     public function login()
     {
@@ -18,7 +18,7 @@ class UserController extends Controller
     }
 
     /**
-     * Handle authentication request
+     * authentication 
      */
     public function AuthLogin(Request $request)
     {
@@ -35,7 +35,7 @@ class UserController extends Controller
     }
 
     /**
-     * Display registration form
+     * register form
      */
     public function register()
     {
@@ -44,7 +44,7 @@ class UserController extends Controller
     }
 
     /**
-     * Create new user account
+     * Create user
      */
     public function store(Request $request)
     {
@@ -67,7 +67,7 @@ class UserController extends Controller
     }
     
     /**
-     * Handle user logout
+     * logout
      */
     public function logout(Request $request)
     {

@@ -181,21 +181,7 @@
                         <h2 class="text-xl font-bold text-gray-800 mb-4">Travel Insights</h2>
                         
                         <div class="space-y-6">
-                            <!-- Visited Locations -->
-                            <div>
-                                <h3 class="text-md font-semibold text-gray-700 mb-2">Visited Destinations</h3>
-                                @if($visitedLocations->count() > 0)
-                                    <div class="flex flex-wrap gap-2">
-                                        @foreach($visitedLocations as $location)
-                                            <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm">
-                                                {{ $location }}
-                                            </span>
-                                        @endforeach
-                                    </div>
-                                @else
-                                    <p class="text-gray-500 text-sm">No destinations visited yet</p>
-                                @endif
-                            </div>
+
                             
                             <!-- Favorite Locations -->
                             <div>

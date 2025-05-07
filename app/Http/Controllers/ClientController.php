@@ -10,7 +10,7 @@ class ClientController extends Controller
     protected $clientRepository;
 
     /**
-     * Create a new controller instance.
+     * controller instance
      *
      * @param ClientRepositoryInterface $clientRepository
      */
@@ -20,7 +20,7 @@ class ClientController extends Controller
     }
 
     /**
-     * Display list of all clients
+     * list of all clients
      */
     public function index()
     {
@@ -29,7 +29,7 @@ class ClientController extends Controller
     }
 
     /**
-     * Display client profile with statistics
+     * client statistics
      */
     public function show($id)
     {
