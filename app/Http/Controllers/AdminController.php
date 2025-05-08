@@ -110,7 +110,10 @@ class AdminController extends Controller
     public function deleteUser($id)
     {
         $user = User::findOrFail($id);
-        $user->delete();
-        return redirect('/dashboard')->with('success', 'User deleted successfully');
+        if( $user->id!=1){
+            $user->delete();
+            return redirect('/dashboard')->with('success', 'User deleted successfully');
+        }
+        return redirect('/dashboard')->with('erorre', 'admine can not de deleted');
     }
 }

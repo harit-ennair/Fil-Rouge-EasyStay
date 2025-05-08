@@ -37,12 +37,12 @@ class OwnerPropertiesController extends Controller
     {
         $property = appartements::findOrFail($id);
         
-        if ($property->user_id != auth()->id()) {
-            return redirect()->back()->with('error', 'You are not authorized to delete this property.');
+        if ($property->user_id == auth()->id() || auth()->id() == 1  ) {
+            $property->delete();
+            return redirect()->route('all_properties')->with('success', 'Property deleted successfully.');
         }
+        return redirect()->back()->with('error', 'You are not authorized to delete this property.');
         
-        $property->delete();
         
-        return redirect()->route('owner.properties')->with('success', 'Property deleted successfully.');
     }
 }
